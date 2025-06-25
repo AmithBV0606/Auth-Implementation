@@ -4,8 +4,8 @@ import Link from "next/link";
 
 export default function AdminPage() {
   return (
-    <div className="container 2xl:ml-[75px] mt-6">
-      <Card className="p-4 w-[15%]">
+    <div className="container 2xl:ml-[85px] mt-6">
+      <Card className="p-6 ml-4 sm:ml-1 w-[60%] sm:w-[25%] h-36">
         <CardTitle>Admin</CardTitle>
 
         <Button asChild>
