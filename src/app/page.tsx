@@ -16,7 +16,7 @@ export default async function HomePage() {
   const fullUser = { id: "", name: "Amith", role: "user" };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 2xl:ml-[75px]">
       {fullUser == null ? (
         <div className="flex gap-4">
           <Button asChild>
