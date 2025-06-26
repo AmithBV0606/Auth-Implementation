@@ -16,7 +16,7 @@ export async function createUserSession(user: UserSession, cookies: Cookies) {
   const sessionId = crypto.randomBytes(512).toString("hex").normalize();
 
   // Store the session id in Redis :
-  redisClient.set(`session:${sessionId}`, sessionSchema.safeParse(user), {
+  redisClient.set(`session:${sessionId}`, sessionSchema.parse(user), {
     ex: SESSION_EXPIRATION_SECONDS,
   });
 
