@@ -1,5 +1,5 @@
 import { LogOutButton } from "@/auth/nextjs/components/LogOutButton";
-// import { getCurrentUser } from "@/auth/nextjs/currentUser";
+import { getCurrentUser } from "@/auth/nextjs/currentUser";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,9 +11,11 @@ import {
 import Link from "next/link";
 
 export default async function HomePage() {
-  // const fullUser = await getCurrentUser({ withFullUser: true });
+  const fullUser = await getCurrentUser();
+
+  // Dummy Data :
   // const fullUser = null;
-  const fullUser = { id: "", name: "Amith", role: "user" };
+  // const fullUser = { id: "", name: "Amith", role: "user" };
 
   return (
     <div className="container mx-auto p-4 2xl:ml-[75px]">
@@ -29,7 +31,9 @@ export default async function HomePage() {
       ) : (
         <Card className="max-w-[500px] mt-4">
           <CardHeader>
-            <CardTitle>User: {fullUser.name}</CardTitle>
+            <CardTitle>
+              User: {fullUser.id} {/* TODO: Fix */}
+            </CardTitle>
             <CardDescription>Role: {fullUser.role}</CardDescription>
           </CardHeader>
           <CardFooter className="flex gap-4">
