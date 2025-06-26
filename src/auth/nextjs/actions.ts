@@ -6,7 +6,11 @@ import { redirect } from "next/navigation";
 import { db } from "@/drizzle/db";
 import { eq } from "drizzle-orm";
 import { UserTable } from "@/drizzle/schema";
-import { generateSalt, hashPassword } from "../core/passwordHasher";
+import {
+  comparePassword,
+  generateSalt,
+  hashPassword,
+} from "../core/passwordHasher";
 import { cookies } from "next/headers";
 import { createUserSession } from "../core/session";
 
@@ -55,6 +59,28 @@ export async function signIn(unsafeData: z.infer<typeof signInSchema>) {
   const { success, data } = signInSchema.safeParse(unsafeData);
 
   if (!success) return "Unable to Log you In!";
+
+  // Check if user with the entered email exists in our DB. If exists return the following columns :
+  const user = await db.query.UserTable.findFirst({
+    columns: { password: true, salt: true, id: true, email: true, role: true },
+    where: eq(UserTable.email, data.email),
+  });
+
+  // If user not found :
+  if (user == null || user.password == null || user.salt == null) {
+    return "Unable to log you in";
+  }
+
+  // If the user exists, we need to verify the password :
+  const isCorrectPassword = await comparePassword({
+    password: data.password,
+    salt: user.salt,
+    hashedPassword: user.password,
+  });
+
+  if (!isCorrectPassword) return "Unable to log you In!!";
+
+  await createUserSession(user, await cookies());
 
   redirect("/");
 }

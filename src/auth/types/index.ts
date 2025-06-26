@@ -18,3 +18,9 @@ export type Cookies = {
   get: (key: string) => { name: string; value: string } | undefined;
   delete: (key: string) => void;
 };
+
+export type ComparePassword = {
+  password: string;
+  salt: string;
+  hashedPassword: string;
+};
