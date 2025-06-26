@@ -45,8 +45,24 @@ export function getUserFromSession(cookies: Pick<Cookies, "get">) {
 
 async function getUserSessionById(sessionId: string) {
   const rawUser = await redisClient.get(`session:${sessionId}`);
-  
-  const { success, data:user } = sessionSchema.safeParse(rawUser);
+
+  const { success, data: user } = sessionSchema.safeParse(rawUser);
 
   return success ? user : null;
+}
+
+// __________________________________________________________________________________
+
+export async function removeUserFromSession(
+  cookies: Pick<Cookies, "get" | "delete">
+) {
+  const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value;
+
+  if (sessionId == null) return null;
+
+  // Delete session Id from redis :
+  await redisClient.del(`session:${sessionId}`);
+
+  // Now delete session Id from cookies :
+  cookies.delete(COOKIE_SESSION_KEY);
 }

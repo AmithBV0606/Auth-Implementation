@@ -12,7 +12,7 @@ import {
   hashPassword,
 } from "../core/passwordHasher";
 import { cookies } from "next/headers";
-import { createUserSession } from "../core/session";
+import { createUserSession, removeUserFromSession } from "../core/session";
 
 export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   const { success, data } = signUpSchema.safeParse(unsafeData);
@@ -82,6 +82,11 @@ export async function signIn(unsafeData: z.infer<typeof signInSchema>) {
 
   await createUserSession(user, await cookies());
 
+  redirect("/");
+}
+
+export async function logOut() {
+  await removeUserFromSession(await cookies());
   redirect("/");
 }
 
