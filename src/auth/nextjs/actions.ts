@@ -7,6 +7,8 @@ import { db } from "@/drizzle/db";
 import { eq } from "drizzle-orm";
 import { UserTable } from "@/drizzle/schema";
 import { generateSalt, hashPassword } from "../core/passwordHasher";
+import { cookies } from "next/headers";
+import { createUserSession } from "../core/session";
 
 export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   const { success, data } = signUpSchema.safeParse(unsafeData);
@@ -20,8 +22,7 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
 
   if (existingUser != null) return "Account already exists for this email!";
 
-  // If the entered email doesn't exist in our DB, we do the following :
-
+  // If the entered email doesn't exist in our DB(Means, it's a new user), we do the following :
   try {
     // 1. We generate the salt and hash the password :
     const salt = generateSalt();
@@ -40,6 +41,9 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
       .returning({ id: UserTable.id, role: UserTable.role });
 
     if (user == null) return "Unable to create account!!";
+
+    // 3. Create a user session :
+    await createUserSession(user, await cookies());
   } catch (error) {
     return "Unable to create account!!";
   }
