@@ -6,28 +6,28 @@ Building an Authentication Systems from scratch.
 
 ### Sign Up :
 
-<img src="./public/Sign-Up.png" />
+<img src="./public/Sign-Up.png" style="border-radius:5%" />
 
 ### Sign In :
 
-<img src="./public/Sign-In.png" />
+<img src="./public/Sign-In.png" style="border-radius:5%" />
 
 ### Authorize :
 
-<img src="./public/Authorize.png" />
+<img src="./public/Authorize.png" style="border-radius:5%" />
 
 ## Auth Implementation using JWT's (Not Recommended) :
 
 ### JWT Sign In :
 
-<img src="./public/Jwt-Sign-In.png" />
+<img src="./public/Jwt-Sign-In.png" style="border-radius:5%" />
 
 ### Authorize using JWT's :
 
-<img src="./public/Authorize-Jwt.png" />
+<img src="./public/Authorize-Jwt.png" style="border-radius:5%" />
 
 ##
 
 ### Where to store the session?
 
-<img src="./public/Store-Session.png" />
+<img src="./public/Store-Session.png" style="border-radius:5%" />
