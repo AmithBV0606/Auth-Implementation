@@ -81,3 +81,20 @@ export async function updateUserSessionData(
     ex: SESSION_EXPIRATION_SECONDS,
   });
 }
+
+// __________________________________________________________________________________
+
+export async function updateUserSessionExpiration(
+  cookies: Pick<Cookies, "set" | "get">
+) {
+  const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value;
+  if (sessionId == null) return null;
+
+  const user = await getUserSessionById(sessionId);
+  if (user == null) return;
+
+  await redisClient.set(`session:${sessionId}`, user, {
+    ex: SESSION_EXPIRATION_SECONDS,
+  });
+  setCookie(sessionId, cookies)
+}
