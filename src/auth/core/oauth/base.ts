@@ -1,15 +1,8 @@
 import { Cookies } from "@/auth/types";
 import { env } from "@/data/env/server";
 import { z } from "zod";
-import { tokenSchema } from "../schemas";
-
-// Custom error class extending from inbuilt Error class :
-export class InvalidTokenError extends Error {
-  constructor(zodError: z.ZodError) {
-    super("Invalid Token!!");
-    this.cause = zodError;
-  }
-}
+import { tokenSchema, userSchema } from "../schemas";
+import { InvalidTokenError, InvalidUserError } from "./error";
 
 export class OAuthClient<T> {
   private get redirectUrl() {
@@ -60,7 +53,29 @@ export class OAuthClient<T> {
 
   async fetchUser(code: string) {
     const { accessToken, tokenType } = await this.fetchToken(code);
-  }
 
-  // Step 3 : To get the user information using the access token :
+    // Step 3 : To get the user information using the access token :
+    const user = await fetch("https://discord.com/api/users/@me", {
+      headers: {
+        Authorization: `${tokenType} ${accessToken}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((rawData) => {
+        // console.log("Raw Data :", rawData);
+        const { data, success, error } = userSchema.safeParse(rawData);
+
+        if (!success) {
+          throw new InvalidUserError(error);
+        }
+
+        return data;
+      });
+
+    return {
+      id: user.id,
+      name: user.global_name ?? user.username,
+      email: user.email,
+    };
+  }
 }

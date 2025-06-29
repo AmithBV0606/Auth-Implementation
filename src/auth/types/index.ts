@@ -24,3 +24,9 @@ export type ComparePassword = {
   salt: string;
   hashedPassword: string;
 };
+
+export type OAuthUser = {
+  id: string;
+  name: string;
+  email: string;
+};
