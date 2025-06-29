@@ -1,6 +1,7 @@
 import { Cookies } from "@/auth/types";
 import { env } from "@/data/env/server";
 import { z } from "zod";
+import { tokenSchema } from "../schemas";
 
 // Custom error class extending from inbuilt Error class :
 export class InvalidTokenError extends Error {
@@ -11,11 +12,6 @@ export class InvalidTokenError extends Error {
 }
 
 export class OAuthClient<T> {
-  private readonly tokenSchema = z.object({
-    access_token: z.string(),
-    token_type: z.string(),
-  });
-
   private get redirectUrl() {
     return new URL("discord", env.OAUTH_REDIRECT_URL_BASE);
   }
@@ -49,7 +45,7 @@ export class OAuthClient<T> {
       .then((res) => res.json())
       .then((rawData) => {
         // console.log(rawData);
-        const { error, data, success } = this.tokenSchema.safeParse(rawData);
+        const { error, data, success } = tokenSchema.safeParse(rawData);
 
         if (!success) {
           throw new InvalidTokenError(error);
