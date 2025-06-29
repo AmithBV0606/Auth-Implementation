@@ -14,3 +14,9 @@ export class InvalidUserError extends Error {
     this.cause = zodError;
   }
 }
+
+export class InvalidStateError extends Error {
+  constructor() {
+    super("Invalid State!!");
+  }
+}

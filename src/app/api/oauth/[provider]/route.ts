@@ -21,9 +21,10 @@ export async function GET(
   const { provider: rawProvider } = await params; // discord/github/google
 
   const code = request.nextUrl.searchParams.get("code");
+  const state = request.nextUrl.searchParams.get("state");
   const provider = z.enum(oAuthProviders).parse(rawProvider);
 
-  if (typeof code !== "string") {
+  if (typeof code !== "string" || typeof state !== "string") {
     redirect(
       `/sign-in?oauthError=${encodeURIComponent(
         "Failed to connect. Please try again!!"
@@ -33,7 +34,11 @@ export async function GET(
 
   try {
     // Using the code we received from Discord/GitHub/Google, Fetch the user :
-    const oAuthUser = await new OAuthClient().fetchUser(code);
+    const oAuthUser = await new OAuthClient().fetchUser(
+      code,
+      state,
+      await cookies()
+    );
     // console.log(user);
 
     // Usring the "oAuthUser" create a new "OAuthUserTable" entry
