@@ -20,3 +20,9 @@ export class InvalidStateError extends Error {
     super("Invalid State!!");
   }
 }
+
+export class InvalidCodeVerifierError extends Error {
+  constructor() {
+    super("Invalid Code Verifier!!");
+  }
+}

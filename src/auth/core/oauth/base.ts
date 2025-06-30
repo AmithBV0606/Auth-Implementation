@@ -3,6 +3,7 @@ import { env } from "@/data/env/server";
 import crypto from "crypto";
 import { tokenSchema, userSchema } from "../schemas";
 import {
+  InvalidCodeVerifierError,
   InvalidStateError,
   InvalidTokenError,
   InvalidUserError,
@@ -39,6 +40,27 @@ function validateState(state: string, cookies: Pick<Cookies, "get">) {
   return cookieState === state;
 }
 
+//  A function for creating code verifier :
+function createCodeVerifier(cookies: Pick<Cookies, "set">) {
+  // Create a codeverifier string :
+  const codeVerifier = crypto.randomBytes(64).toString("hex").normalize();
+
+  // Store the codeVerifier in cookies :
+  cookies.set(CODE_VERIFIER_COOKIE_KEY, codeVerifier, {
+    secure: true,
+    httpOnly: true,
+    sameSite: "lax",
+    expires: Date.now() + COOKIE_EXPIRATION_SECONDS * 1000,
+  });
+  return codeVerifier;
+}
+
+// A function to get the code verifier from the OAuth provider :
+function getCodeVerifier(cookies: Pick<Cookies, "get">) {
+  const codeVerifier = cookies.get(CODE_VERIFIER_COOKIE_KEY)?.value;
+  return codeVerifier;
+}
+
 export class OAuthClient<T> {
   private get redirectUrl() {
     return new URL("discord", env.OAUTH_REDIRECT_URL_BASE);
@@ -47,17 +69,23 @@ export class OAuthClient<T> {
   // Step 1 : To get the code by sending them the Auth Url :
   createAuthUrl(cookies: Pick<Cookies, "set">) {
     const state = createState(cookies);
+    const codeVerifier = createCodeVerifier(cookies);
     const url = new URL("https://discord.com/oauth2/authorize");
     url.searchParams.set("client_id", env.DISCORD_CLIENT_ID);
     url.searchParams.set("redirect_uri", this.redirectUrl.toString());
     url.searchParams.set("response_type", "code");
     url.searchParams.set("scope", "identify email"); // What info you need discord to send it back to you?
+    url.searchParams.set("code_challenge_method", "S256");
     url.searchParams.set("state", state);
+    url.searchParams.set(
+      "code_challenge",
+      crypto.hash("sha256", codeVerifier, "base64url")
+    );
     return url.toString();
   }
 
   // Step 2 : Use the code from step 1 to get our user Access Token :
-  private fetchToken(code: string) {
+  private fetchToken(code: string, codeVerifier: string) {
     return fetch("https://discord.com/api/oauth2/token", {
       method: "POST",
       headers: {
@@ -70,6 +98,7 @@ export class OAuthClient<T> {
         grant_type: "authorization_code",
         client_id: env.DISCORD_CLIENT_ID,
         client_secret: env.DISCORD_CLIENT_SECRET,
+        code_verifier: codeVerifier,
       }),
     })
       .then((res) => res.json())
@@ -91,10 +120,16 @@ export class OAuthClient<T> {
   async fetchUser(code: string, state: string, cookies: Pick<Cookies, "get">) {
     // To Validate the State :
     const isValidState = await validateState(state, cookies);
-
     if (!isValidState) throw new InvalidStateError();
 
-    const { accessToken, tokenType } = await this.fetchToken(code);
+    // To get the code verifier
+    const codeVerifier = getCodeVerifier(cookies);
+    if (!codeVerifier) throw new InvalidCodeVerifierError();
+
+    const { accessToken, tokenType } = await this.fetchToken(
+      code,
+      codeVerifier
+    );
 
     // Step 3 : To get the user information using the access token :
     const user = await fetch("https://discord.com/api/users/@me", {
