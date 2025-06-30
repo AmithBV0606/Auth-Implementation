@@ -13,7 +13,6 @@ import Link from "next/link";
 export default async function HomePage() {
   const fullUser = await getCurrentUser({
     withFullUser: true,
-    redirectIfNotFound: true,
   });
 
   // Dummy Data :
