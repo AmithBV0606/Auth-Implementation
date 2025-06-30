@@ -2,6 +2,7 @@ import { Cookies } from "@/auth/types";
 import { OAuthProvider } from "@/drizzle/schema";
 import crypto from "crypto";
 import { createDiscordOAuthClient } from "../providers/discord";
+import { createGitHubOAuthClient } from "../providers/github";
 
 // A state is a large string which we generate and send along the request url. The discord sends the same state back to us. We just need to make sure that, what we sent them is the same thing they sent back to us.
 
@@ -66,7 +67,7 @@ export function getOAuthClient(provider: OAuthProvider) {
       return createDiscordOAuthClient();
 
     case "github":
-      return createDiscordOAuthClient();
+      return createGitHubOAuthClient();
 
     default:
       throw new Error(`Invalid provider : ${provider satisfies never}`);

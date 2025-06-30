@@ -17,3 +17,10 @@ export const discordUserSchema = z.object({
   global_name: z.string().nullable(),
   email: z.string().email(),
 });
+
+export const githubUserSchema = z.object({
+  id: z.number(),
+  name: z.string().nullable(),
+  login: z.string(),
+  email: z.string().email(),
+});
