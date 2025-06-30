@@ -1,7 +1,6 @@
 import { env } from "@/data/env/server";
 import { OAuthClient } from "../oauth/base";
-import { userSchema } from "../schemas";
-import { z } from "zod";
+import { discordUserSchema } from "../schemas";
 
 export function createDiscordOAuthClient() {
   return new OAuthClient({
@@ -15,7 +14,7 @@ export function createDiscordOAuthClient() {
       user: "https://discord.com/api/users/@me",
     },
     userInfo: {
-      schema: userSchema,
+      schema: discordUserSchema,
       parser: (user) => ({
         id: user.id,
         name: user.global_name ?? user.username,
