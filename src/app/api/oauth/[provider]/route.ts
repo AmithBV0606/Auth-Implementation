@@ -68,7 +68,7 @@ async function connectUserToAccount(
     });
 
     // If the user doesn't exists in our DB, we create a new entry fo t :
-    if (user === null) {
+    if (user == null) {
       const [newUser] = await trx
         .insert(UserTable)
         .values({ name: name, email: email })
@@ -77,12 +77,10 @@ async function connectUserToAccount(
       user = newUser;
     }
 
-    if (user == null) throw new Error("Something went wrong!!");
-
     // Insert the new OAuth provider into our Database :
     await trx
       .insert(UserOAuthAccountTable)
-      .values({ userId: user.id, provider: provider, providerAccountId: id })
+      .values({ provider, providerAccountId: id, userId: user.id })
       .onConflictDoNothing();
 
     return user;
