@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { signInSchema } from "../schemas";
 import Link from "next/link";
+import { Github } from "@geist-ui/icons";
+import Image from "next/image";
 
 export function SignInForm() {
   const [error, setError] = useState<string>();
@@ -39,13 +41,26 @@ export function SignInForm() {
           <Button
             type="button"
             onClick={async () => await oAuthSignIn("discord")}
+            className="cursor-pointer"
           >
+            <span className="border border-black p-[2px] rounded-full">
+              <Image
+                src={"/discord-logo.png"}
+                height={20}
+                width={20}
+                alt="discord logo"
+              />
+            </span>
             Discord
           </Button>
           <Button
             type="button"
             onClick={async () => await oAuthSignIn("github")}
+            className="cursor-pointer"
           >
+            <span className="bg-black p-1 rounded-full">
+              <Github color="#fff" />
+            </span>
             GitHub
           </Button>
         </div>
