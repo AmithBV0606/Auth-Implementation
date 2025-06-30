@@ -11,7 +11,7 @@ import {
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
 
 export async function GET(
@@ -48,7 +48,11 @@ export async function GET(
     await createUserSession(user, await cookies());
   } catch (error) {
     console.error(error);
-    redirect("/sign-in");
+    redirect(
+      `/sign-in?oauthError=${encodeURIComponent(
+        "Failed to connect. Please try again!!"
+      )}`
+    );
   }
 
   redirect("/");
@@ -65,7 +69,7 @@ async function connectUserToAccount(
       columns: { id: true, role: true },
     });
 
-    // If the user doesn't exists in our DB :
+    // If the user doesn't exists in our DB, we create a new entry fo t :
     if (user === null) {
       const [newUser] = await trx
         .insert(UserTable)

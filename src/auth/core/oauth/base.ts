@@ -7,9 +7,8 @@ import {
   InvalidTokenError,
   InvalidUserError,
 } from "./error";
-import { error } from "console";
 
-// A state is a large string which we generate and send along the request url. The discord send the same state sent by us for security purposes.
+// A state is a large string which we generate and send along the request url. The discord sends the same state back to us. We just need to make sure that, what we sent them is the same thing they sent back to us.
 
 const STATE_COOKIE_KEY = "oAuthState";
 const CODE_VERIFIER_COOKIE_KEY = "oAuthCodeVerifier";
@@ -19,7 +18,10 @@ const COOKIE_EXPIRATION_SECONDS = 60 * 10;
 
 // A function for creating the state string :
 function createState(cookies: Pick<Cookies, "set">) {
+  // Create a state :
   const state = crypto.randomBytes(64).toString("hex").normalize();
+
+  // Store the state in cookies :
   cookies.set(STATE_COOKIE_KEY, state, {
     secure: true,
     httpOnly: true,
