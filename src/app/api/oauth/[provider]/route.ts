@@ -1,3 +1,4 @@
+import { getOAuthClient } from "@/auth/core/oauth-security/helper";
 import { OAuthClient } from "@/auth/core/oauth/base";
 import { createUserSession } from "@/auth/core/session";
 import { OAuthUser } from "@/auth/types";
@@ -32,14 +33,11 @@ export async function GET(
     );
   }
 
+  const oAuthCient = getOAuthClient(provider);
+
   try {
     // Using the code we received from Discord/GitHub/Google, Fetch the user :
-    const oAuthUser = await new OAuthClient().fetchUser(
-      code,
-      state,
-      await cookies()
-    );
-    // console.log(user);
+    const oAuthUser = await oAuthCient.fetchUser(code, state, await cookies());
 
     // Usring the "oAuthUser" create a new "OAuthUserTable" entry
     const user = await connectUserToAccount(oAuthUser, provider);
@@ -50,7 +48,7 @@ export async function GET(
     console.error(error);
     redirect(
       `/sign-in?oauthError=${encodeURIComponent(
-        "Failed to connect. Please try again!!"
+        "Failed to connect. Please try again!!!!!!"
       )}`
     );
   }
@@ -84,7 +82,7 @@ async function connectUserToAccount(
     // Insert the new OAuth provider into our Database :
     await trx
       .insert(UserOAuthAccountTable)
-      .values({ userId: user?.id, provider: provider, providerAccountId: id })
+      .values({ userId: user.id, provider: provider, providerAccountId: id })
       .onConflictDoNothing();
 
     return user;

@@ -13,7 +13,7 @@ import {
 } from "../core/passwordHasher";
 import { cookies } from "next/headers";
 import { createUserSession, removeUserFromSession } from "../core/session";
-import { OAuthClient } from "../core/oauth/base";
+import { getOAuthClient } from "../core/oauth-security/helper";
 
 export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   const { success, data } = signUpSchema.safeParse(unsafeData);
@@ -92,5 +92,7 @@ export async function logOut() {
 }
 
 export async function oAuthSignIn(provider: OAuthProvider) {
-  redirect(new OAuthClient().createAuthUrl(await cookies()));
+  const oAuthClient = getOAuthClient(provider);
+
+  redirect(oAuthClient.createAuthUrl(await cookies()));
 }

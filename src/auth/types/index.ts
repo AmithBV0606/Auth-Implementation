@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { sessionSchema } from "../core/schemas";
+import { OAuthProvider } from "@/drizzle/schema";
 
 export type UserSession = z.infer<typeof sessionSchema>;
 
@@ -29,4 +30,20 @@ export type OAuthUser = {
   id: string;
   name: string;
   email: string;
+};
+
+export type GenericTypeProps<T> = {
+  provider: OAuthProvider;
+  clientId: string;
+  clientSecret: string;
+  scopes: string[];
+  urls: {
+    auth: string;
+    token: string;
+    user: string;
+  };
+  userInfo: {
+    schema: z.ZodSchema<T>;
+    parser: (data: T) => { id: string; email: string; name: string };
+  };
 };
