@@ -121,6 +121,16 @@ Copy the content from `.env.local` to `.env`.
 
 #### 7. Setup postgreSQL using docker : 
 
+- Inside `.env` add the following variables :
+```bash
+DB_PASSWORD=mysecretpassword
+DB_USER=postgres
+DB_NAME=postgres
+DB_HOST=localhost
+
+OAUTH_REDIRECT_URL_BASE=http://localhost:3000/api/oauth/
+```
+
 - Pull the image :
 ```bash
 docker pull postgres:latest
